@@ -1,0 +1,11 @@
+.env
+.DS_Store
+.chainlit/
+.vscode/
+.files/
+__pycache__/
+camera/
+detections/**
+main.log
+chainlit.md
+**/*.pt
