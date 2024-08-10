@@ -46,8 +46,8 @@ Copy the `.env-sample` into `.env` and edit it accordingly. Chances are you can 
 The only parameter you'll probably want to play with is the `MIN_FRAME_SIMILARITY`, empirically anything from `0.75` to `0.89` seems to work well. Higher values will trigger the analysis on too many frames, lower values reduce the sensitivity and only trigger an analysis when two frames are very different.
 
 # Running the Project
-- Clone this project: `git clone XXX`
-- `cd XXX`
+- Clone this project: `git clone https://github.com/RamonBeast/aiarmageddon.git`
+- `cd airmageddon`
 - Create a `virtualenv`: `virtualenv venv` (`pip install virtualenv`)
 - Activate it: `. ./venv/bin/activate`
 - Install all requirements: `pip install -r requirements.txt`
