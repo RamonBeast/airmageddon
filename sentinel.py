@@ -1,7 +1,7 @@
-from logger import Logger
-from guard import Guard
-from burglar import Burglar
-from functions import LLMFunctions
+from utils.logger import Logger
+from agents.guard import Guard
+from agents.burglar import Burglar
+from utils.functions import LLMFunctions
 
 """
 This class is used to analyse camera feeds and create memory blocks
@@ -21,7 +21,7 @@ class Sentinel():
         response = self.guard.send_message(f'CameraFeed: {description}')
         response = f'Guard: {response}\nCameraFeed: {description}\n'
 
-        Logger.info(response)
+        #Logger.info(response)
 
         if self.llm_func.is_function_call(response):
             Logger.info(f'Decision taken without consultation: {response}')
@@ -32,15 +32,15 @@ class Sentinel():
         # AKA the loop is not interrupted on purpose
         while True:
             burg = self.burglar.send_message(response)
-            Logger.info(f'Ex-burglar: {burg}')
+            #Logger.info(f'Ex-burglar: {burg}')
             
             response += 'Ex-burglar: ' + burg + '\n'
 
             decision = self.guard.send_message(response)
-            Logger.info(f'Guard: {decision}')
+            #Logger.info(f'Guard: {decision}')
 
             if self.llm_func.is_function_call(decision):
-                Logger.info(f'Verdict achieved: {decision} at turn {turns}')
+                #Logger.info(f'Verdict achieved: {decision} at turn {turns}')
                 break
 
             response += 'Guard: ' + decision + '\n'

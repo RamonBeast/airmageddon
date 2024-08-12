@@ -22,7 +22,7 @@ except (ImportError, AssertionError):
     os.system("pip install -U ultralytics")
     import ultralytics
 
-from utils.general import (
+from yolo_utils.general import (
     ROOT,
     check_suffix,
     yaml_load,
@@ -504,7 +504,7 @@ class DetectMultiBackend(nn.Module):
         """
         # types = [pt, jit, onnx, xml, engine, coreml, saved_model, pb, tflite, edgetpu, tfjs, paddle]
         #from export import export_formats
-        from utils.downloads import is_url
+        from yolo_utils.downloads import is_url
 
         #sf = list(export_formats().Suffix)  # export suffixes
         sf = ['.pt', '.jit', '.onnx', '.xml', '.engine', '.coreml', '.saved_model', '.pb', '.tflite', '.edgetpu', '.tfjs', '.paddle']

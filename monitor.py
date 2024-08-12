@@ -7,10 +7,10 @@ from datetime import datetime
 from sentinel import Sentinel
 from florence import Florence
 from PIL import Image
-from logger import Logger
+from utils.logger import Logger
 from yolo.yolo_monitor import YoloMonitor
-from functions import LLMFunctions
-from listener import EventPublisher
+from utils.functions import LLMFunctions
+from utils.listener import EventPublisher
 
 def save_detection(image: Image, caption: str, response: str, act: bool):
     # This only has 1s resolution
@@ -32,7 +32,7 @@ def main(args):
 
     Logger.info('Loading models...')
 
-    video = YoloMonitor(source=os.getenv('CAMERA_FEED'))
+    video = YoloMonitor(source= args[1] if len(args) > 1 else os.getenv('CAMERA_FEED'))
     video.warmup()
     Logger.info('Yolo loaded')
 
@@ -46,7 +46,7 @@ def main(args):
 
     # Let's notify that we are starting our monitoring
     memory = EventPublisher()
-    memory.create_memory('Monitoring started', 'None')
+    memory.create_memory('MonitoringStarted', True)
 
     f = []
     threshold = float(os.getenv('MIN_FRAME_SIMILARITY'))

@@ -3,7 +3,8 @@ import json
 import os
 from pushnotifier.PushNotifier import PushNotifier
 from typing import Tuple
-from listener import EventPublisher
+from utils.listener import EventPublisher
+from utils.logger import Logger
 
 class LLMFunctions():
     @classmethod
@@ -39,14 +40,14 @@ class LLMFunctions():
             return
         
         pn = PushNotifier(os.getenv('PN_USERNAME'), os.getenv('PN_PASSWORD'), os.getenv('PN_PACKAGE_NAME'), os.getenv('PN_API_KEY'))
-        #print(f'LLM called notify(): {text}')
+        #Logger.info(f'LLM called notify(): {text}')
         pn.send_text(text)
 
     def next(self):
-        print('LLM invoked next')
+        Logger.info('LLM invoked next')
 
     def owners_away(self, away: bool):
-        print(f'Called owners_away with {away}')
+        Logger.info(f'LLM Called owners_away with away set to {away}')
         memory = EventPublisher()
 
         memory.create_memory('OwnersAway', away)

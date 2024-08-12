@@ -13,10 +13,12 @@ import scipy
 import json
 import torch
 import os
+import yaml
+from datetime import datetime
 from io import BytesIO
 from TTS.api import TTS
-from listener import EventListener
-from functions import LLMFunctions
+from utils.listener import EventListener, MemoryManager
+from utils.functions import LLMFunctions
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,7 +26,8 @@ device = "cuda:0" if torch.cuda.is_available() else "cpu"
 tts = TTS("tts_models/en/vctk/vits").to(device)
 listener = EventListener()
 llm_func = LLMFunctions()
-events_memory = []
+memory_manager = MemoryManager()
+events_memory = memory_manager.get_last_run()
 tts_enabled = (os.getenv('CHATBOT_VOICE_ENABLED', 'false').lower() == 'true')
 
 #stt = whisper.load_model("small")
@@ -99,6 +102,17 @@ async def generate_answer(message, messages):
 async def on_chat_start():
     while (msg := listener.get_message_non_blocking()) is not None:
         events_memory.append(json.dumps(msg))
+
+    # Format memories in a way that doesn't disturb Langchain
+    memories = [f'{m["time"]} {m["event"]}' for m in events_memory]
+
+    current_date = datetime.now().strftime("%d %b %Y")
+    current_time = datetime.now().strftime("%H:%M")
+
+    with open('./conf/agents.yml', 'r') as file:
+        prompt = yaml.safe_load(file)
+        agent_prompt = prompt['agents']['chatbot']
+        agent_prompt = agent_prompt.format(current_date=current_date, current_time=current_time, events_memory=memories)
     
     model = ChatOpenAI(streaming=True,
                 openai_api_base=os.getenv('LLAMA_SERVER'),
@@ -106,54 +120,7 @@ async def on_chat_start():
                 )
     prompt = ChatPromptTemplate.from_messages(
         [
-            (
-                "system",
-                f"""You're an attentive home monitoring system and you will answer all questions asked by the owner. 
-                You act like a bored teenager and you address the owner as dude, bro, bruh, fam and similar vocatives.
-                You generally reply in very short sentences, like if entire weight of the world was on your shoulder because you're
-                overdramatic. 
-                You will voluntarily skip or omit all minor and non-threatening events in your memory, unless asked for them directly.
-                Do not add emotions spelled as text as they won't be visible.
-
-                You have access to the following function:
-
-                Function 'owners_away' to track whether the owners are at home or not
-                {{{{
-                "name": "owners_away",
-                "description": "Let the alarm system know if the owners away",
-                "parameters": {{{{
-                    "away": {{{{
-                    "param_type": "bool",
-                    "description": "True of the owners are away, False otherwise",
-                    "required": true
-                    }}}}
-                }}}}
-                }}}}
-
-                If you choose to call a function ONLY reply in the following format:
-                <{{{{start_tag}}}}={{{{function_name}}}}>{{{{parameters}}}}{{{{end_tag}}}}
-                where
-
-                start_tag => `<function`
-                parameters => a JSON dict with the function argument name as key and function argument value as value.
-                end_tag => `</function>`
-
-                Here is an example,
-                <function=example_function_name>{{{{"example_name": "example_value"}}}}</function>
-
-                You call a function only if:
-                - The owners tells you that they are leaving or that they have already left
-                - The owners tells you that they're back home or they're coming back
-
-                When you call a function, ONLY reply with the function.
-                Remember the exact format to call a function. This is important.
-
-                You have a comprehensive memory of the events after the PastEvents tag, use it to give information to the owner.
-
-                PastEvents:
-                {events_memory}
-                """
-            ),
+            ("system", agent_prompt),
             MessagesPlaceholder(variable_name="history"),
             ("human", "{question}"),
         ]
@@ -283,6 +250,6 @@ async def on_message(message: cl.Message):
 #     answer_message.elements = [output_audio_el]
 #     await answer_message.update()
 
-# if __name__ == "__main__":
-#     from chainlit.cli import run_chainlit
-#     run_chainlit(__file__)
+if __name__ == "__main__":
+    from chainlit.cli import run_chainlit
+    run_chainlit(__file__)

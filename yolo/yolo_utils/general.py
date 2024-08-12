@@ -45,9 +45,9 @@ except (ImportError, AssertionError):
 
 from ultralytics.utils.checks import check_requirements
 
-from utils import TryExcept, emojis
-from utils.downloads import curl_download, gsutil_getsize
-from utils.metrics import box_iou, fitness
+from yolo_utils import TryExcept, emojis
+from yolo_utils.downloads import curl_download, gsutil_getsize
+from yolo_utils.metrics import box_iou, fitness
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[1]  # YOLOv5 root directory

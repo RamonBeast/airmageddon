@@ -8,8 +8,8 @@ import torch
 import yaml
 from tqdm import tqdm
 
-from utils import TryExcept
-from utils.general import LOGGER, TQDM_BAR_FORMAT, colorstr
+from yolo_utils import TryExcept
+from yolo_utils.general import LOGGER, TQDM_BAR_FORMAT, colorstr
 
 PREFIX = colorstr("AutoAnchor: ")
 
@@ -117,7 +117,7 @@ def kmean_anchors(dataset="./data/coco128.yaml", n=9, img_size=640, thr=4.0, gen
     if isinstance(dataset, str):  # *.yaml file
         with open(dataset, errors="ignore") as f:
             data_dict = yaml.safe_load(f)  # model dict
-        from utils.dataloaders import LoadImagesAndLabels
+        from yolo_utils.dataloaders import LoadImagesAndLabels
 
         dataset = LoadImagesAndLabels(data_dict["train"], augment=True, rect=True)
 

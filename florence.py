@@ -4,7 +4,7 @@ from PIL import Image
 from transformers import AutoProcessor, AutoModelForCausalLM 
 from transformers.dynamic_module_utils import get_imports
 from unittest.mock import patch
-from logger import Logger
+from utils.logger import Logger
 
 class Florence():
     model = None
@@ -42,7 +42,7 @@ class Florence():
 
     def process_frame(self, task_prompt: str, image: Image=None) -> str:
         if self.model is None:
-            print('Florence model has not been correctly loaded')
+            Logger.error('Florence model has not been correctly loaded')
             return ''
         
         prompt = task_prompt
@@ -58,5 +58,5 @@ class Florence():
         generated_text = self.processor.batch_decode(generated_ids, skip_special_tokens=False)[0]
         parsed_answer = self.processor.post_process_generation(generated_text, task=task_prompt, image_size=(image.width, image.height))
 
-        Logger.info(f'Florence: {parsed_answer}')
+        Logger.info(f'[M] Florence: {parsed_answer["<MORE_DETAILED_CAPTION>"]}')
         return parsed_answer

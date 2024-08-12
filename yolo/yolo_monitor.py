@@ -13,15 +13,15 @@ if str(ROOT) not in sys.path:
 ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
 from models.common import DetectMultiBackend
-from utils.dataloaders import IMG_FORMATS, VID_FORMATS, LoadImages, LoadScreenshots, LoadStreams
-from utils.general import (
+from yolo_utils.dataloaders import IMG_FORMATS, VID_FORMATS, LoadImages, LoadScreenshots, LoadStreams
+from yolo_utils.general import (
     Profile,
     check_file,
     check_img_size,
     non_max_suppression,
     scale_boxes
 )
-from utils.torch_utils import select_device, smart_inference_mode
+from yolo_utils.torch_utils import select_device, smart_inference_mode
 
 class YoloMonitor:
     def __init__(self, weights: str = None, source: str = None, 

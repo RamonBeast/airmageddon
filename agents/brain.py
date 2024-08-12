@@ -1,9 +1,9 @@
 import requests
 import json
 import os
-from listener import EventListener
+from utils.listener import EventListener
 from typing import List
-from logger import Logger
+from utils.logger import Logger
 
 class Brain():
     system = ''
@@ -26,8 +26,9 @@ class Brain():
             self._update_memory()
         
             if len(self.events_memory) > 0:
-                Logger.info(f'Sending memory: ' + '\n'.join(self.events_memory[:self.max_memories]))
-                prompt += 'PastEvents: ' + '\n'.join(self.events_memory[-self.max_memories:])
+                memories = '\n'.join(self.events_memory[-self.max_memories:])
+                Logger.notify(f'Current memories: {memories}')
+                prompt += f'PastEvents: {memories}'
             
         prompt += f'\nOwnersAway: {self.owners_away}\n'
         # Add terminator to the system prompt

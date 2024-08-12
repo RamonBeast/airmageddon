@@ -9,7 +9,7 @@ import sys
 from contextlib import contextmanager
 from pathlib import Path
 
-from utils.general import LOGGER, colorstr
+from yolo_utils.general import LOGGER, colorstr
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[3]  # YOLOv5 root directory

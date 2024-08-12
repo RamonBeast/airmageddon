@@ -4,6 +4,7 @@ import json
 import os
 from queue import Queue, Empty
 from datetime import datetime
+from typing import List
 
 class EventListener:
     def __init__(self, redis_client: redis.Redis = None, channel: str = 'events'):
@@ -52,8 +53,41 @@ class EventPublisher:
         return datetime.now().strftime("%b %d %H:%M")
 
     def create_memory(self, event: str, action: str = None):
-        self.publish ({
+        memory = {
                 'time': self.get_time(),
                 'event': event,
                 'action': action
-            })
+            }
+        
+        self.publish(memory)
+        self.redis_client.rpush('events', json.dumps(memory))
+
+class MemoryManager:
+    def __init__(self, redis_client: redis.Redis = None, channel: str = 'events'):
+        self.redis_client = redis_client if redis_client != None else \
+            redis.Redis(host=os.getenv('REDIS_SERVER'), port=int(os.getenv('REDIS_PORT')), db=int(os.getenv('REDIS_DB')))
+        self.channel = channel
+
+    def get_memories(self, max_memories=500) -> List[str]:
+        entries = self.redis_client.lrange('events', 0, max_memories)
+        entries = [json.loads(entry) for entry in entries]
+        
+        return entries
+    
+    def get_last_run(self) -> List[str]:
+        """ Returns memories from the last monitoring cycle in chronological order """
+        monitoring_started = None
+
+        entries = self.get_memories()
+
+        for i in range(len(entries) - 1, -1, -1):
+            if entries[i]['event'].casefold() == 'monitoringstarted' and entries[i]['action'] == True:
+                monitoring_started = i
+                break
+        
+        if monitoring_started is not None:
+            # Remove the MonitoringStarted entry
+            return entries[monitoring_started + 1:]
+        else:
+            return []
+
