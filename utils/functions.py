@@ -15,6 +15,10 @@ class LLMFunctions():
         if match:
             function_name = match.group(1)
             params = match.group(2)
+
+            if params == '':
+                params = '{}'
+
             return function_name, json.loads(params)
         else:
             return None, None
