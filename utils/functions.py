@@ -7,6 +7,8 @@ from utils.logger import Logger
 from conf.configuration import Configuration
 
 class LLMFunctions():
+    _conf = Configuration()
+
     @classmethod
     def _parse_response(cls, response: str) -> Tuple[str, dict] | Tuple[None, None]:
         pattern = r'(?i)<function=([a-zA-Z0-9_]+)>(.*?)</function>'
@@ -40,14 +42,11 @@ class LLMFunctions():
         return instance.call_function(function_name, params)
     
     def notify(self, text: str):
-        self.conf = Configuration()
-        
-        if self.conf.get_config_param('pn_api_key') == None or self.conf.get_config_param('pn_package_name') == None:
+        if self._conf.get_config_param('pn_api_key') is None or self._conf.get_config_param('pn_package_name') is None:
             return
         
-        pn = PushNotifier(self.conf.get_config_param('pn_username'), self.conf.get_config_param('pn_password'), 
-                          self.conf.get_config_param('pn_package_name'), self.conf.get_config_param('pn_api_key'))
-        #Logger.info(f'LLM called notify(): {text}')
+        pn = PushNotifier(self._conf.get_config_param('pn_username'), self._conf.get_config_param('pn_password'), 
+                          self._conf.get_config_param('pn_package_name'), self._conf.get_config_param('pn_api_key'))
         pn.send_text(text)
 
     def next(self):
