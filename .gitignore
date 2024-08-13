@@ -1,4 +1,5 @@
 .env
+conf/config.yml
 .DS_Store
 .chainlit/
 .vscode/

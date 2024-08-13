@@ -1,10 +1,11 @@
-import os
 import sys
+import os
+import torch
+import cv2
 from typing import Tuple
 from pathlib import Path
 from datetime import datetime
-import torch
-import cv2
+from conf.configuration import Configuration
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
@@ -27,8 +28,9 @@ class YoloMonitor:
     def __init__(self, weights: str = None, source: str = None, 
                  imgsz: Tuple[int, int] = (1280, 768), conf_thres: float = 0.25, iou_thres: float = 0.45,
                  max_det: int = 100, device: str = "cpu", vid_stride: int = 1):
-        self.weights = weights if weights != None else os.path.join(os.getenv('MODELS_FOLDER'), os.getenv('YOLO_WEIGHTS'))
-        self.source = source if source != None else os.getenv('CAMERA_FEED')
+        self.conf = Configuration()
+        self.weights = weights if weights != None else os.path.join(self.conf.get_config_param('models_folder'), self.conf.get_config_param('yolo_weights'))
+        self.source = source if source != None else self.conf.get_config_param('camera_feed')
         self.imgsz = imgsz
         self.conf_thres = conf_thres
         self.iou_thres = iou_thres
@@ -88,7 +90,7 @@ class YoloMonitor:
     def save_image(self) -> str:
         save_path = datetime.now().strftime("%Y%m%d-%H%M%S")
         save_path += f'-{self.progressive:02d}.png'
-        captures = os.path.join(os.getenv('CAPTURES_FOLDER'), save_path)
+        captures = os.path.join(self.conf.get_config_param('captures_folder'), save_path)
 
         if self.dataset.mode == "image":
             cv2.imwrite(captures, self.img)

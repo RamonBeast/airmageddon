@@ -2,7 +2,6 @@ import os
 import sys
 import time
 import json
-from dotenv import load_dotenv
 from datetime import datetime
 from sentinel import Sentinel
 from florence import Florence
@@ -11,11 +10,14 @@ from utils.logger import Logger
 from yolo.yolo_monitor import YoloMonitor
 from utils.functions import LLMFunctions
 from utils.listener import EventPublisher
+from conf.configuration import Configuration
+
+conf = Configuration()
 
 def save_detection(image: Image, caption: str, response: str, act: bool):
     # This only has 1s resolution
     filename = datetime.now().strftime("%Y%m%d-%H%M%S")
-    save_path = os.path.join(os.getenv('CAPTURES_FOLDER'), filename)
+    save_path = os.path.join(conf.get_config_param('captures_folder'), filename)
 
     resp = {
         'image': filename,
@@ -28,18 +30,16 @@ def save_detection(image: Image, caption: str, response: str, act: bool):
     json.dump(resp, open(save_path + '.json', 'w'))
 
 def main(args):
-    load_dotenv()
-
     Logger.info('Loading models...')
 
-    video = YoloMonitor(source= args[1] if len(args) > 1 else os.getenv('CAMERA_FEED'))
+    video = YoloMonitor(source= args[1] if len(args) > 1 else conf.get_config_param('camera_feed'))
     video.warmup()
     Logger.info('Yolo loaded')
 
     florence = Florence()
     Logger.info('Florence is ready')
 
-    sentinel = Sentinel(max_memories=int(os.getenv('GUARD_MAX_MEMORIES')))
+    sentinel = Sentinel(max_memories=int(conf.get_config_param('guard_max_memories')))
     Logger.info('Sentinel is active')
 
     llm_func = LLMFunctions()
@@ -49,7 +49,7 @@ def main(args):
     memory.create_memory('MonitoringStarted', True)
 
     f = []
-    threshold = float(os.getenv('MIN_FRAME_SIMILARITY'))
+    threshold = float(conf.get_config_param('min_frame_similarity'))
 
     # Monitoring loop
     while True:
@@ -97,6 +97,10 @@ def main(args):
 
             # Start the loop between the Guard and the Ex-Burglar
             response = sentinel.analyze_feed(caption)
+
+            if response is None:
+                Logger.error('Sentinel cannot analyze feed, terminating')
+                return None
             
             if (func_name := llm_func.is_function_call(response)) != None:
                 #Logger.warning(f'Passing control to Alarm: {response}')

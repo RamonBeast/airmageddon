@@ -1,15 +1,17 @@
 import redis
 import threading
 import json
-import os
 from queue import Queue, Empty
 from datetime import datetime
 from typing import List
+from conf.configuration import Configuration
 
 class EventListener:
     def __init__(self, redis_client: redis.Redis = None, channel: str = 'events'):
+        self.conf = Configuration()
         self.redis_client = redis_client if redis_client != None else \
-            redis.Redis(host=os.getenv('REDIS_SERVER'), port=int(os.getenv('REDIS_PORT')), db=int(os.getenv('REDIS_DB')))
+            redis.Redis(host=self.conf.get_config_param('redis_server'), port=int(self.conf.get_config_param('redis_port')), 
+                        db=int(self.conf.get_config_param('redis_db')))
         self.channel = channel
         self.pubsub = self.redis_client.pubsub()
         self.pubsub.subscribe(channel)
@@ -41,8 +43,10 @@ class EventListener:
         
 class EventPublisher:
     def __init__(self, redis_client: redis.Redis = None, channel: str = 'events'):
+        self.conf = Configuration()
         self.redis_client = redis_client if redis_client != None else \
-            redis.Redis(host=os.getenv('REDIS_SERVER'), port=int(os.getenv('REDIS_PORT')), db=int(os.getenv('REDIS_DB')))
+            redis.Redis(host=self.conf.get_config_param('redis_server'), port=int(self.conf.get_config_param('redis_port')), 
+                        db=int(self.conf.get_config_param('redis_db')))
         self.channel = channel
 
     def publish(self, msg: dict):
@@ -64,8 +68,10 @@ class EventPublisher:
 
 class MemoryManager:
     def __init__(self, redis_client: redis.Redis = None, channel: str = 'events'):
+        self.conf = Configuration()
         self.redis_client = redis_client if redis_client != None else \
-            redis.Redis(host=os.getenv('REDIS_SERVER'), port=int(os.getenv('REDIS_PORT')), db=int(os.getenv('REDIS_DB')))
+            redis.Redis(host=self.conf.get_config_param('redis_server'), port=int(self.conf.get_config_param('redis_port')), 
+                        db=int(self.conf.get_config_param('redis_db')))
         self.channel = channel
 
     def get_memories(self, max_memories=500) -> List[str]:

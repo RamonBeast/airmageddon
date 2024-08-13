@@ -13,12 +13,17 @@ class Sentinel():
         self.burglar = Burglar()
         self.llm_func = LLMFunctions()
 
-    def analyze_feed(self, description: str) -> str:
+    def analyze_feed(self, description: str) -> str | None:
         response = ''
         turns = 0
 
         # Kickstart the Guard by prompting it with the CameraFeed
         response = self.guard.send_message(f'CameraFeed: {description}')
+
+        if response is None:
+            Logger.error('Error sending message')
+            return None
+
         response = f'Guard: {response}\nCameraFeed: {description}\n'
 
         #Logger.info(response)

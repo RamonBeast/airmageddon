@@ -1,31 +1,32 @@
 import requests
 import json
-import os
 from openai import OpenAI
 from utils.listener import EventListener
 from typing import List
 from utils.logger import Logger
+from conf.configuration import Configuration
 
 class Brain():
     system = ''
     events_memory = []
 
     def __init__(self, system_prompt: str, max_memories: int = 0, temperature: float = 0.01, use_openai: bool = False):
+        self.conf = Configuration()
         self.system = system_prompt
         self.max_memories = max_memories
         self.temperature = temperature
         self.owners_away = True # Out of caution, we assume the owners are away by default
         self.listener = EventListener()
         self.listener.start()
-        self.use_openai = use_openai
+        self.use_local_llm = self.conf.get_config_bool('use_local_llm')
         self.deploy_id = None
-        self.model_name = os.getenv('MODEL_NAME')
+        self.model_name = self.conf.get_config_param('model_name')
 
-        if self.use_openai:
-            self.openai = OpenAI(api_key=os.getenv('OPENAI_API_KEY'), base_url=os.getenv('OPENAI_SERVER_COMPLETION'))
-            self.deploy_id = os.getenv('DEPLOY_ID')
-        else:
+        if self.use_local_llm:
             self.openai = None
+        else:
+            self.openai = OpenAI(api_key=self.conf.get_config_param('openai_api_key'), base_url=self.conf.get_config_param('openai_server_completion'))
+            self.deploy_id = self.conf.get_config_param('deploy_id')
 
     def send_message(self, msg: str) -> str:
         # System prompt
@@ -47,7 +48,7 @@ class Brain():
         # User prompt
         prompt += f"<|start_header_id|>user<|end_header_id|>\n\n{msg}<|eot_id|><|start_header_id|>assistant<|end_header_id|>"
 
-        return self.send_openai(prompt) if self.use_openai else self.send_llama(prompt)
+        return self.send_llama(prompt) if self.use_local_llm else self.send_openai(prompt)
     
     def send_llama(self, prompt: str):
         req = {
@@ -77,7 +78,7 @@ class Brain():
             "prompt": prompt
         }
 
-        response = requests.post(os.getenv('LLAMA_SERVER_COMPLETION'), json = req)
+        response = requests.post(self.conf.get_config_param('llama_server_completion'), json = req)
 
         if response.status_code == 200:
             return response.json()['content'].strip()
@@ -88,6 +89,8 @@ class Brain():
         completion = self.openai.completions.create(
             model=self.deploy_id if self.deploy_id != None else self.model_name,
             prompt=prompt,
+            temperature=self.temperature,
+            top_p=0.95,
             stop=['<|eot_id|>', '<|python_tag|>', '<|eom_id|>'],
             stream=False
         )

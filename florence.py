@@ -5,15 +5,17 @@ from transformers import AutoProcessor, AutoModelForCausalLM
 from transformers.dynamic_module_utils import get_imports
 from unittest.mock import patch
 from utils.logger import Logger
+from conf.configuration import Configuration
 
 class Florence():
     model = None
 
     def __init__(self):
+        self.config = Configuration()
         self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
         self.torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 
-        path = os.path.join(os.getenv('MODELS_FOLDER'), 'Florence-2-large')
+        path = os.path.join(self.config.get_config_param('models_folder'), 'Florence-2-large')
 
         if not os.path.exists(path):
             path = 'microsoft/Florence-2-large'

@@ -1,10 +1,10 @@
 import re
 import json
-import os
 from pushnotifier.PushNotifier import PushNotifier
 from typing import Tuple
 from utils.listener import EventPublisher
 from utils.logger import Logger
+from conf.configuration import Configuration
 
 class LLMFunctions():
     @classmethod
@@ -40,10 +40,13 @@ class LLMFunctions():
         return instance.call_function(function_name, params)
     
     def notify(self, text: str):
-        if os.getenv('PN_API_KEY') == '' or os.getenv('PN_API_KEY') == None:
+        self.conf = Configuration()
+        
+        if self.conf.get_config_param('pn_api_key') == None or self.conf.get_config_param('pn_package_name') == None:
             return
         
-        pn = PushNotifier(os.getenv('PN_USERNAME'), os.getenv('PN_PASSWORD'), os.getenv('PN_PACKAGE_NAME'), os.getenv('PN_API_KEY'))
+        pn = PushNotifier(self.conf.get_config_param('pn_username'), self.conf.get_config_param('pn_password'), 
+                          self.conf.get_config_param('pn_package_name'), self.conf.get_config_param('pn_api_key'))
         #Logger.info(f'LLM called notify(): {text}')
         pn.send_text(text)
 
