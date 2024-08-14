@@ -15,7 +15,7 @@ class Brain():
         self.system = system_prompt
         self.max_memories = max_memories
         self.temperature = temperature
-        self.owners_away = True # Out of caution, we assume the owners are away by default
+        self.owners_away = self.conf.get_config_bool('owners_away')
         self.listener = EventListener()
         self.listener.start()
         self.use_local_llm = self.conf.get_config_bool('use_local_llm')

@@ -32,6 +32,7 @@ Remember that environment variables override configuration variables.
   `openai_server_completion`: `openai` or compatible providers completion API endpoint
   `chatbot_voice_enabled`: enable or disable (`true` or `false`) text-to-speech in the chatbot UI, requires `espeak`
   `use_local_llm`: whether to do inference with the local `llama_server` or using the `openai_server_completion` API
+  `owners_away`: set the initial status of the owners when the script starts
   `models_folder`: path to the folder containing all models' weights
   `llm_weights`: LLM's weights filename
   `yolo_weights`: YOLO's weights filename

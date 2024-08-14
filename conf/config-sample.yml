@@ -6,6 +6,7 @@ config:
   openai_server_completion:
   chatbot_voice_enabled: false
   use_local_llm: true
+  owners_away: true
   models_folder: ./models
   llm_weights: Meta-Llama-3.1-8B-Instruct-Q6_K_L.gguf
   yolo_weights: yolov5m6.pt
