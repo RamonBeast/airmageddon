@@ -4,10 +4,13 @@ from pushnotifier.PushNotifier import PushNotifier
 from typing import Tuple
 from utils.listener import EventPublisher
 from utils.logger import Logger
-from conf.configuration import Configuration
+from utils.configuration import Configuration
 
 class LLMFunctions():
     _conf = Configuration()
+    _memory = EventPublisher()
+    _pn = PushNotifier(_conf.get_config_param('pn_username'), _conf.get_config_param('pn_password'), 
+                          _conf.get_config_param('pn_package_name'), _conf.get_config_param('pn_api_key'))
 
     @classmethod
     def _parse_response(cls, response: str) -> Tuple[str, dict] | Tuple[None, None]:
@@ -39,22 +42,20 @@ class LLMFunctions():
     @classmethod
     def call_class_function(cls, instance, response):
         function_name, params = cls._parse_response(response)
+
         return instance.call_function(function_name, params)
     
     def notify(self, text: str):
         if self._conf.get_config_param('pn_api_key') is None or self._conf.get_config_param('pn_package_name') is None:
             return
-        
-        pn = PushNotifier(self._conf.get_config_param('pn_username'), self._conf.get_config_param('pn_password'), 
-                          self._conf.get_config_param('pn_package_name'), self._conf.get_config_param('pn_api_key'))
-        pn.send_text(text)
+
+        self._pn.send_text(text)
 
     def next(self):
         Logger.info('LLM invoked next')
 
     def owners_away(self, away: bool):
-        Logger.info(f'LLM Called owners_away with away set to {away}')
-        memory = EventPublisher()
-
-        memory.create_memory('OwnersAway', away)
+        self._memory.create_memory('OwnersAway', away)
+        Logger.info(f'LLM invoked owners_away = {away}')
+        
 

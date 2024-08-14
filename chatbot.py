@@ -16,7 +16,7 @@ from io import BytesIO
 from TTS.api import TTS
 from utils.listener import EventListener, MemoryManager
 from utils.functions import LLMFunctions
-from conf.configuration import Configuration
+from utils.configuration import Configuration
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 conf = Configuration()

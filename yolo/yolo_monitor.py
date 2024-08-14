@@ -5,7 +5,7 @@ import cv2
 from typing import Tuple
 from pathlib import Path
 from datetime import datetime
-from conf.configuration import Configuration
+from utils.configuration import Configuration
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory

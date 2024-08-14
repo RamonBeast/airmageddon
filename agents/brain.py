@@ -4,7 +4,7 @@ from openai import OpenAI
 from utils.listener import EventListener
 from typing import List
 from utils.logger import Logger
-from conf.configuration import Configuration
+from utils.configuration import Configuration
 
 class Brain():
     system = ''

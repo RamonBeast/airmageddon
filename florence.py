@@ -5,7 +5,7 @@ from transformers import AutoProcessor, AutoModelForCausalLM
 from transformers.dynamic_module_utils import get_imports
 from unittest.mock import patch
 from utils.logger import Logger
-from conf.configuration import Configuration
+from utils.configuration import Configuration
 
 class Florence():
     model = None

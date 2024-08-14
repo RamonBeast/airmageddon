@@ -4,7 +4,16 @@ from dotenv import load_dotenv
 from utils.logger import Logger
 
 class Configuration:
-    def __init__(self, config_path: str = './conf/config.yml'):
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._init(*args, **kwargs)
+
+        return cls._instance
+
+    def _init(self, config_path: str = './conf/config.yml'):
         self.config_path = config_path
         self.config = {}
         self.config_loaded = False

@@ -4,7 +4,7 @@ import json
 from queue import Queue, Empty
 from datetime import datetime
 from typing import List
-from conf.configuration import Configuration
+from utils.configuration import Configuration
 
 class EventListener:
     def __init__(self, redis_client: redis.Redis = None, channel: str = 'events'):

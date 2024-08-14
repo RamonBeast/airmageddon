@@ -1,7 +1,7 @@
 from datetime import datetime
 from agents.brain import Brain
 from utils.logger import Logger
-from conf.configuration import Configuration
+from utils.configuration import Configuration
 
 """
 This class is used to analyse camera feeds and talk to the Burglar

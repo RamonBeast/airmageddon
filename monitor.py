@@ -10,7 +10,7 @@ from utils.logger import Logger
 from yolo.yolo_monitor import YoloMonitor
 from utils.functions import LLMFunctions
 from utils.listener import EventPublisher
-from conf.configuration import Configuration
+from utils.configuration import Configuration
 
 conf = Configuration()
 
