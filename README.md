@@ -26,29 +26,29 @@ Copy `conf/config-sample.yml` to `conf/config.yml` and edit the file accordingly
 If you prefer environment variables, or you're running the script in Docker, copy the `.env-sample` into `.env` and edit it accordingly.
 Remember that environment variables override configuration variables.
 
-  `camera_feed`: path to your camera, a video or a folder with images or files to analyze (eg: rtsp://camera.local/feed)
-  `llama_server`: `llama-server` address
-  `llama_server_completion`: `llama-server` address for /completion api
-  `openai_server_completion`: `openai` or compatible providers completion API endpoint
-  `chatbot_voice_enabled`: enable or disable (`true` or `false`) text-to-speech in the chatbot UI, requires `espeak`
-  `use_local_llm`: whether to do inference with the local `llama_server` or using the `openai_server_completion` API
-  `owners_away`: set the initial status of the owners when the script starts
-  `models_folder`: path to the folder containing all models' weights
-  `llm_weights`: LLM's weights filename
-  `yolo_weights`: YOLO's weights filename
-  `redis_host:` Redis host
-  `redis_port`: Redis port
-  `redis_db`: Redis db
-  `openai_api_key`: any string if you're using a local LLM otherwise it will be your API key for that provider
-  `guard_max_memories`: the maximum number of memories to transfer to the agents
-  `min_frame_similarity`: the minimum similarity difference (from 0.0 to 1.0) to trigger an analysis from the LLM
-  `deploy_id`: if you're using DeepInfra as your OpenAI compatible provider
-  `model_name`: not necessary if you're using a local llm, otherwise meta-llama/Meta-Llama-3-8B-Instruct or the model you prefer
-  `captures_folder`: path to the folder where you want to store all images and responses analyzed by the LLM
-  `pn_username`: Your `Pushnotifier` username (required by the API)
-  `pn_password`: Your `Pushnotifier` password (required by the API)
-  `pn_package_name`: Your `Pushnotifier` package name (required by the API), you can create this from [here](https://pushnotifier.de/account/api)
-  `pn_api_key`: Your `Pushnotifier` API KEY (required by the API), you can obtain this from [here](https://pushnotifier.de/account/api)
+- `camera_feed`: path to your camera, a video or a folder with images or files to analyze (eg: rtsp://camera.local/feed)
+- `llama_server`: `llama-server` address
+- `llama_server_completion`: `llama-server` address for /completion api
+- `openai_server_completion`: `openai` or compatible providers completion API endpoint
+- `chatbot_voice_enabled`: enable or disable (`true` or `false`) text-to-speech in the chatbot UI, requires `espeak`
+- `use_local_llm`: whether to do inference with the local `llama_server` or using the `openai_server_completion` API
+- `owners_away`: set the initial status of the owners when the script starts
+- `models_folder`: path to the folder containing all models' weights
+- `llm_weights`: LLM's weights filename
+- `yolo_weights`: YOLO's weights filename
+- `redis_host:` Redis host
+- `redis_port`: Redis port
+- `redis_db`: Redis db
+- `openai_api_key`: any string if you're using a local LLM otherwise it will be your API key for that provider
+- `guard_max_memories`: the maximum number of memories to transfer to the agents
+- `min_frame_similarity`: the minimum similarity difference (from 0.0 to 1.0) to trigger an analysis from the LLM
+- `deploy_id`: if you're using DeepInfra as your OpenAI compatible provider
+- `model_name`: not necessary if you're using a local llm, otherwise meta-llama/Meta-Llama-3-8B-Instruct or the model you prefer
+- `captures_folder`: path to the folder where you want to store all images and responses analyzed by the LLM
+- `pn_username`: Your `Pushnotifier` username (required by the API)
+- `pn_password`: Your `Pushnotifier` password (required by the API)
+- `pn_package_name`: Your `Pushnotifier` package name (required by the API), you can create this from [here](https://pushnotifier.de/account/api)
+- `pn_api_key`: Your `Pushnotifier` API KEY (required by the API), you can obtain this from [here](https://pushnotifier.de/account/api)
 
 The only parameter you'll probably want to play with is the `min_frame_similarity`, empirically anything from `0.75` to `0.89` seems to work well. Higher values will trigger the analysis on too many frames, especially if there's movement, lower values reduce the sensitivity and only trigger an analysis when two frames are very different.
 

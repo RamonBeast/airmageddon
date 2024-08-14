@@ -74,7 +74,7 @@ def main(args):
             # Check if image similarity hit the threshold
             if sim >= threshold:
                 Logger.info(f'Skipping, similarity: {sim:0.2f}, detections: {detections}')
-                #time.sleep(1.0) # Throttle to 1 FPS
+                #time.sleep(2.0) # Throttle to 0.5 FPS
                 continue
 
             # From here on, we start reasoning on the image itself
