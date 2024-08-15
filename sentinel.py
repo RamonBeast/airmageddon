@@ -52,3 +52,12 @@ class Sentinel():
             turns += 1
 
         return decision
+    
+    def get_cumulative_tokens(self) -> dict:
+        guard = self.guard.get_cumulative_tokens()
+        burglar = self.burglar.get_cumulative_tokens()
+
+        return {
+            'completion_tokens': guard['completion_tokens'] + burglar['completion_tokens'],
+            'prompt_tokens': guard['prompt_tokens'] + burglar['prompt_tokens']
+        }

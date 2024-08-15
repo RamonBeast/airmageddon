@@ -74,7 +74,7 @@ def main(args):
             # Check if image similarity hit the threshold
             if sim >= threshold:
                 Logger.info(f'Skipping, similarity: {sim:0.2f}, detections: {detections}')
-                #time.sleep(2.0) # Throttle to 0.5 FPS
+                time.sleep(2.0) # Throttle to 0.5 FPS
                 continue
 
             # From here on, we start reasoning on the image itself
@@ -92,7 +92,7 @@ def main(args):
             if '<MORE_DETAILED_CAPTION>' in frame_caption:
                 caption = frame_caption['<MORE_DETAILED_CAPTION>']
             else:
-                Logger.info(f'Florence did not return a caption, skipping frame')
+                Logger.warning(f'Florence did not return a caption, skipping frame')
                 continue
 
             # Start the loop between the Guard and the Ex-Burglar
@@ -102,13 +102,17 @@ def main(args):
                 Logger.error('Sentinel cannot analyze feed, terminating')
                 return None
             
+            if (tokens := sentinel.get_cumulative_tokens()) is not None:
+                Logger.notify(f'[$] Cumulative tokens - prompt: {tokens["prompt_tokens"]}, completion: {tokens["completion_tokens"]}')
+            
             if (func_name := llm_func.is_function_call(response)) != None:
                 #Logger.warning(f'Passing control to Alarm: {response}')
                 save_detection(image, caption, response, False)
                 memory.create_memory(caption, func_name)
                 llm_func.call_class_function(llm_func, response)
             else:
-                Logger.info('No dangers detected, continuing monitoring')
+                pass
+                #Logger.info('No dangers detected, continuing monitoring')
                 #save_detection(image, caption, response, True)
         except StopIteration:
             break

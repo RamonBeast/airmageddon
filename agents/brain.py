@@ -16,11 +16,14 @@ class Brain():
         self.max_memories = max_memories
         self.temperature = temperature
         self.owners_away = self.conf.get_config_bool('owners_away')
+        self.use_local_llm = self.conf.get_config_bool('use_local_llm')
         self.listener = EventListener()
         self.listener.start()
         self.use_local_llm = self.conf.get_config_bool('use_local_llm')
         self.deploy_id = None
         self.model_name = self.conf.get_config_param('model_name')
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
 
         if self.use_local_llm:
             self.openai = None
@@ -95,7 +98,10 @@ class Brain():
             stream=False
         )
         
-        Logger.info(f'Prompt tokens: {completion.usage.prompt_tokens}, Completion tokens: {completion.usage.completion_tokens}')
+        Logger.notify(f'[$] Tokens - prompt: {completion.usage.prompt_tokens}, completion: {completion.usage.completion_tokens}')
+        self.prompt_tokens += completion.usage.prompt_tokens
+        self.completion_tokens += completion.usage.completion_tokens
+
         return completion.choices[0].text.lstrip()
 
     def _update_memory(self):
@@ -111,3 +117,9 @@ class Brain():
 
     def get_memory(self) -> List[str]:
         return self.events_memory
+    
+    def get_cumulative_tokens(self) -> dict | None:
+        if not self.use_local_llm:
+            return { 'completion_tokens': self.completion_tokens, 'prompt_tokens': self.prompt_tokens }
+        else:
+            return None

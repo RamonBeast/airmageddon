@@ -53,7 +53,7 @@ Remember that environment variables override configuration variables.
 The only parameter you'll probably want to play with is the `min_frame_similarity`, empirically anything from `0.75` to `0.89` seems to work well. Higher values will trigger the analysis on too many frames, especially if there's movement, lower values reduce the sensitivity and only trigger an analysis when two frames are very different.
 
 # Running the Project
-- Clone this project: `git clone https://github.com/RamonBeast/aiarmageddon.git`
+- Clone this project: `git clone https://github.com/RamonBeast/airmageddon.git`
 - `cd airmageddon`
 - Create a `virtualenv`: `virtualenv venv` (`pip install virtualenv`)
 - Activate it: `. ./venv/bin/activate`
@@ -65,7 +65,7 @@ The only parameter you'll probably want to play with is the `min_frame_similarit
 - Start the alarm system: `python monitor.py` (this will stream all conversations between the agents)
 
 ## Chatbot
-The chatbot is available by default on `http://localhost:8000/`, if you tell the chatbot that you are back home, or you are leaving home, **it will set the state accordingly** and the other agents will know whether you're home or not. This changes the way they alert about potential threats, for instance, if you're watching TV, the agents won't usually send alerts. Sometimes they will alert you anyway with notifications like `no threats, everything is ok` or funnily with `Person on the lying on the couch, they might be hurt` or similar silly alerts. If you leave home, the agents will usually trigger a notification if they see someone on the cameras.
+The chatbot is available by default on `http://localhost:8000/`, if you tell the chatbot that you are back home, or you are leaving home, **it will set the state accordingly** and the other agents will know whether you're home or not. This changes the way they alert about potential threats, for instance, if you're watching TV, the agents won't usually send alerts. Sometimes they will alert you anyway with notifications like `no threats, everything is ok` or funnily with `Person lying on the couch, they might be hurt` or similar silly alerts. If you leave home, the agents will usually trigger a notification if they see someone on the cameras.
 
 ## Prompts
 System prompts are defined in the `agents` of the `conf/config.yml` file. If you're using the smaller 8B model, agents will lose attention easily and they will start to hallucinate, especially if they're passed on too many memories (hence, the default is `3`). For longer conversations they might have troubles calling functions correctly. Larger models, like 70B, do handle the prompt more efficiently and hallucinate less.

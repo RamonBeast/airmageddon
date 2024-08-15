@@ -32,3 +32,6 @@ class Guard():
         Logger.info(f'[A] Guard - {response}')
 
         return response
+    
+    def get_cumulative_tokens(self) -> dict:
+        return self.brain.get_cumulative_tokens()
