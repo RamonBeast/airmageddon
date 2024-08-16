@@ -1,5 +1,5 @@
-# AIarmageddon
-`AI armageddon` is a prototype project that showcases how to run basic visual reasoning on a camera, video or list of images. In this experiment two LLM agents talk to each other to understand if the image shows a potential threat, then they decide whether or not to alert the owner.
+# AIrmageddon
+`AIrmageddon` is a prototype project that showcases how to run basic visual reasoning on a camera, video or list of images. In this experiment two LLM agents talk to each other to understand if the image shows a potential threat, then they decide whether or not to alert the owner.
 
 Each frame or image is passed through `YOLOv5`, if the current frame differs sufficiently from the previous one it is passed down to `Florence-2` for captioning. The caption is in turn passed down to an LLM (Llama 3.1 8B by default) that starts a conversation with a second LLM, the first takes the role of a `Security Guard`, the second of a `Burglar`. When a decision is taken the `Security Guard` can either decide to move along with the analysis or raise an alert.
 

@@ -5,6 +5,7 @@ from queue import Queue, Empty
 from datetime import datetime
 from typing import List
 from utils.configuration import Configuration
+from utils.logger import Logger
 
 class EventListener:
     def __init__(self, redis_client: redis.Redis = None, channel: str = 'events'):
@@ -81,6 +82,15 @@ class MemoryManager:
         return entries
     
     def get_last_run(self) -> List[str]:
+        if (inject_mem := self.conf.get_debug_param('inject_memories')) is not None:
+            Logger.notify('Injecting memories from configuration file')
+
+            try:
+                return json.loads(inject_mem)
+            except json.JSONDecodeError:
+                Logger.error('Injected memories are not a valid JSON string')
+                return None
+
         """ Returns memories from the last monitoring cycle in chronological order """
         monitoring_started = None
 

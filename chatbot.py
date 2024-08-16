@@ -21,12 +21,8 @@ from utils.configuration import Configuration
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 conf = Configuration()
 tts = TTS("tts_models/en/vctk/vits").to(device)
-listener = EventListener()
 llm_func = LLMFunctions()
-memory_manager = MemoryManager()
-events_memory = memory_manager.get_last_run()
 tts_enabled = conf.get_config_bool('chatbot_voice_enabled')
-agent_prompt = conf.get_agent_config('chatbot')
 
 #stt = whisper.load_model("small")
 
@@ -98,19 +94,40 @@ async def generate_answer(message, messages):
 
 @cl.on_chat_start
 async def on_chat_start():
+    listener = EventListener()
+    memory_manager = MemoryManager()
+    events_memory = memory_manager.get_last_run()
+
+    # This can happen if the user tries to inject memories with an invalid JSON string
+    if events_memory is None:
+        events_memory = []
+
     while (msg := listener.get_message_non_blocking()) is not None:
         events_memory.append(json.dumps(msg))
+
+    agent_prompt = conf.get_agent_config('chatbot')
+    assert agent_prompt != None and len(agent_prompt) > 0
+
+    owners_away = conf.get_config_bool('owners_away')
+    use_local_llm = conf.get_config_bool('use_local_llm')
+    model_id = conf.get_config_param('deploy_id')
+
+    if model_id is None:
+        model_id = conf.get_config_param('model_name')
 
     # Format memories in a way that doesn't disturb Langchain
     memories = [f'{m["time"]} {m["event"]}' for m in events_memory]
 
     current_date = datetime.now().strftime("%d %b %Y")
     current_time = datetime.now().strftime("%H:%M")
-    agent_prompt = agent_prompt.format(current_date=current_date, current_time=current_time, events_memory=memories)
+    agent_prompt = agent_prompt.format(current_date=current_date, 
+                                       current_time=current_time, events_memory=memories,
+                                       owners_away=owners_away)
     
     model = ChatOpenAI(streaming=True,
-                openai_api_base=conf.get_config['llama_server'],
-                openai_api_key=conf.get_config['openai_api_key']
+                openai_api_base=conf.get_config_param('llama_server') if use_local_llm else conf.get_config_param('openai_server_completion'),
+                openai_api_key=conf.get_config_param('openai_api_key'),
+                model=model_id
                 )
     prompt = ChatPromptTemplate.from_messages(
         [
@@ -244,6 +261,6 @@ async def on_message(message: cl.Message):
 #     answer_message.elements = [output_audio_el]
 #     await answer_message.update()
 
-if __name__ == "__main__":
-    from chainlit.cli import run_chainlit
-    run_chainlit(__file__)
+# if __name__ == "__main__":
+#     from chainlit.cli import run_chainlit
+#     run_chainlit(__file__)

@@ -48,6 +48,9 @@ class Configuration:
         
         conf = self.config['config']
 
+        if conf is None:
+            return None
+
         """ Return a parameter from the config section only """
         return os.getenv(param.upper(), conf[param] if param in conf else None)
     
@@ -57,6 +60,9 @@ class Configuration:
             return None
         
         conf = self.config['config']
+
+        if conf is None:
+            return None
 
         par = os.getenv(param.upper(), conf[param] if param in conf else None)
 
@@ -76,7 +82,24 @@ class Configuration:
         
         conf = self.config['agents']
 
+        if conf is None:
+            return None
+
         return conf[agent] if agent in conf else None
+
+    def get_debug_param(self, param: str) -> str | None:
+        if not self.config_loaded:
+            return None
+        
+        if not 'debug' in self.config:
+            return None
+
+        conf = self.config['debug']
+
+        if conf is None:
+            return None
+
+        return conf[param] if param in conf else None
 
     def get_config(self) -> dict:
         return self.config
