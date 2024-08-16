@@ -116,7 +116,7 @@ async def on_chat_start():
         model_id = conf.get_config_param('model_name')
 
     # Format memories in a way that doesn't disturb Langchain
-    memories = [f'{m["time"]} {m["event"]}' for m in events_memory]
+    memories = [f'{m["time"]} {m["event"]} {m["action"]}' for m in events_memory]
 
     current_date = datetime.now().strftime("%d %b %Y")
     current_time = datetime.now().strftime("%H:%M")
