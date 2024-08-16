@@ -16,6 +16,7 @@ config:
   openai_api_key: sk-nothing-here
   guard_max_memories: 3
   min_frame_similarity: 0.84
+  frame_capture_interval: 3.5
   deploy_id:
   model_name: meta-llama/Meta-Llama-3-8B-Instruct
   captures_folder: ./captures

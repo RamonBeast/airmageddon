@@ -42,6 +42,7 @@ Remember that environment variables override configuration variables.
 - `openai_api_key`: any string if you're using a local LLM otherwise it will be your API key for that provider
 - `guard_max_memories`: the maximum number of memories to transfer to the agents
 - `min_frame_similarity`: the minimum similarity difference (from 0.0 to 1.0) to trigger an analysis from the LLM
+- `frame_capture_interval`: how often, in seconds, to run analysis on a frame from a camera or a stream (does not apply to folders and videos), set to 0 to disable throttling
 - `deploy_id`: if you're using DeepInfra as your OpenAI compatible provider
 - `model_name`: not necessary if you're using a local llm, otherwise meta-llama/Meta-Llama-3-8B-Instruct or the model you prefer
 - `captures_folder`: path to the folder where you want to store all images and responses analyzed by the LLM

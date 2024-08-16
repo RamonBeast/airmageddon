@@ -49,7 +49,9 @@ def main(args):
     memory.create_memory('MonitoringStarted', True)
 
     f = []
+    prev_frame = 0
     threshold = float(conf.get_config_param('min_frame_similarity'))
+    frame_capture_interval = float(conf.get_config_param('frame_capture_interval'))
 
     # Monitoring loop
     while True:
@@ -63,6 +65,12 @@ def main(args):
                 f = feats
                 continue
 
+            # Throttle video capture (only for cameras and streams)
+            if video.webcam and t0 - prev_frame < frame_capture_interval:
+                continue
+
+            prev_frame = time.time()
+
             sim = video.get_similarity(f, feats)
             f = feats
 
@@ -74,7 +82,6 @@ def main(args):
             # Check if image similarity hit the threshold
             if sim >= threshold:
                 Logger.info(f'Skipping, similarity: {sim:0.2f}, detections: {detections}')
-                time.sleep(2.0) # Throttle to 0.5 FPS
                 continue
 
             # From here on, we start reasoning on the image itself
