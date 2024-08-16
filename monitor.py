@@ -81,11 +81,11 @@ def main(args):
 
             # Check if image similarity hit the threshold
             if sim >= threshold:
-                Logger.info(f'Skipping, similarity: {sim:0.2f}, detections: {detections}')
+                Logger.info(f'Skipping, similarity: {sim:0.2f}, detections: {detections}', ts=True)
                 continue
 
             # From here on, we start reasoning on the image itself
-            Logger.warning(f'Change detected, similarity: {sim:0.2f}, detections: {detections}')
+            Logger.warning(f'Change detected, similarity: {sim:0.2f}, detections: {detections}', ts=True)
 
             image = video.get_image()
 
@@ -110,7 +110,7 @@ def main(args):
                 return None
             
             if (tokens := sentinel.get_cumulative_tokens()) is not None:
-                Logger.notify(f'[$] Cumulative tokens - prompt: {tokens["prompt_tokens"]}, completion: {tokens["completion_tokens"]}')
+                Logger.notify(f'[$] Cumulative tokens - prompt: {tokens["prompt_tokens"]}, completion: {tokens["completion_tokens"]}', ts=True)
             
             if (func_name := llm_func.is_function_call(response)) != None:
                 #Logger.warning(f'Passing control to Alarm: {response}')
