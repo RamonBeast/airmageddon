@@ -16,7 +16,7 @@ config:
   openai_api_key: sk-nothing-here
   guard_max_memories: 3
   min_frame_similarity: 0.84
-  triggers: [balaclava, knife]
+  triggers: [car, knife]
   frame_capture_interval: 3.5
   deploy_id:
   model_name: meta-llama/Meta-Llama-3-8B-Instruct
