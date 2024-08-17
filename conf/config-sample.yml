@@ -166,3 +166,4 @@ agents:
     {events_memory}
 
 debug:
+  active: false

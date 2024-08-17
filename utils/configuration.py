@@ -98,6 +98,10 @@ class Configuration:
 
         if conf is None:
             return None
+        
+        # Check if the debug section is enabled
+        if 'active' not in conf or conf['active'] == False:
+            return None
 
         return conf[param] if param in conf else None
 
