@@ -105,5 +105,27 @@ class Configuration:
 
         return conf[param] if param in conf else None
 
+    def get_debug_bool(self, param: str) -> bool | None:
+        """ Returns a boolean parameter from the config section """
+        if not self.config_loaded:
+            return None
+        
+        conf = self.config['debug']
+
+        if conf is None:
+            return None
+
+        par = conf[param] if param in conf else None
+
+        if isinstance(par, bool):
+            return par
+        elif isinstance(par, str):
+            if par.lower() == 'true' or par.lower() == 'yes':
+                return True
+            else:
+                return False
+        else:
+            return None
+        
     def get_config(self) -> dict:
         return self.config

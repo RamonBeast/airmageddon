@@ -82,7 +82,8 @@ class MemoryManager:
         return entries
     
     def get_last_run(self) -> List[str]:
-        if (inject_mem := self.conf.get_debug_param('inject_memories')) is not None:
+        if self.conf.get_debug_bool('active') and \
+            (inject_mem := self.conf.get_debug_param('inject_memories')) is not None:
             Logger.notify('Injecting memories from configuration file')
 
             try:

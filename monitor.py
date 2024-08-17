@@ -52,6 +52,7 @@ def main(args):
     prev_frame = 0
     threshold = float(conf.get_config_param('min_frame_similarity'))
     frame_capture_interval = float(conf.get_config_param('frame_capture_interval'))
+    triggers = conf.get_config_param('triggers')
 
     # Monitoring loop
     while True:
@@ -80,7 +81,7 @@ def main(args):
                 continue
 
             # Check if image similarity hit the threshold
-            if sim >= threshold:
+            if sim >= threshold and not any(trigger in detections for trigger in triggers):
                 Logger.info(f'Skipping, similarity: {sim:0.2f}, detections: {detections}', ts=True)
                 continue
 
