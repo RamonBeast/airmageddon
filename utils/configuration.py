@@ -86,6 +86,20 @@ class Configuration:
             return None
 
         return conf[agent] if agent in conf else None
+    
+    def get_section_config(self, section: str, param: str) -> str | None:
+        if not self.config_loaded:
+            return None
+        
+        if section not in self.config:
+            return None
+        
+        conf = self.config[section]
+
+        if conf is None:
+            return None
+
+        return conf[param] if param in conf else None
 
     def get_debug_param(self, param: str) -> str | None:
         if not self.config_loaded:
