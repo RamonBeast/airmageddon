@@ -29,7 +29,14 @@ class LLMFunctions():
             return None, None
 
     def call_function(self, function_name, params):
+        if not hasattr(self, function_name):
+            Logger.error(f"'Trying to call '{function_name}' that does not exist")
+            return
+
         func = getattr(self, function_name)
+
+        if not callable(func):
+            Logger.error(f"'{function_name}' is not callable")
 
         return func(**params)
     

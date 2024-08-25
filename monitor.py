@@ -1,5 +1,5 @@
 import os
-import sys
+import argparse
 import time
 import json
 from datetime import datetime
@@ -29,17 +29,24 @@ def save_detection(image: Image, caption: str, response: str, act: bool):
     image.save(save_path + '.png')
     json.dump(resp, open(save_path + '.json', 'w'))
 
-def main(args):
+def main():
+    parser = argparse.ArgumentParser(description='AIrmageddon')
+    parser.add_argument('--source', default=conf.get_config_param('camera_feed'), help='Feed source (rtsp, video file, directory, single image)')
+    parser.add_argument('--max-memories', default=conf.get_config_param('guard_max_memories'), help='Maximum number of memories to pass to the agents')
+    parser.add_argument('--min-frame-similarity', default=conf.get_config_param('min_frame_similarity'), help='Minimum frame similarity to trigger a new frame capture')
+    parser.add_argument('--frame-capture-interval', default=conf.get_config_param('frame_capture_interval'), help='Interval between frame captures')
+    args = parser.parse_args()
+
     Logger.info('Loading models...')
 
-    video = YoloMonitor(source= args[1] if len(args) > 1 else conf.get_config_param('camera_feed'))
+    video = YoloMonitor(source=args.source)
     video.warmup()
     Logger.info('Yolo loaded')
 
     florence = Florence()
     Logger.info('Florence is ready')
 
-    sentinel = Sentinel(max_memories=int(conf.get_config_param('guard_max_memories')))
+    sentinel = Sentinel(max_memories=int(args.max_memories))
     Logger.info('Sentinel is active')
 
     llm_func = LLMFunctions()
@@ -50,8 +57,8 @@ def main(args):
 
     f = []
     prev_frame = 0
-    threshold = float(conf.get_config_param('min_frame_similarity'))
-    frame_capture_interval = float(conf.get_config_param('frame_capture_interval'))
+    threshold = float(args.min_frame_similarity)
+    frame_capture_interval = float(args.frame_capture_interval)
     triggers = conf.get_config_param('triggers')
 
     # Monitoring loop
@@ -129,4 +136,4 @@ def main(args):
         Logger.info(f'Frame processed in {t1 - t0:.6f}s')
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main()
