@@ -9,8 +9,9 @@ from utils.configuration import Configuration
 class Brain():
     system = ''
     events_memory = []
+    home_automations = []
 
-    def __init__(self, system_prompt: str, max_memories: int = 0, temperature: float = 0.01, use_openai: bool = False):
+    def __init__(self, system_prompt: str, max_memories: int = 0, temperature: float = 0.01, use_automations: bool = False):
         self.conf = Configuration()
         self.system = system_prompt
         self.max_memories = max_memories
@@ -24,6 +25,7 @@ class Brain():
         self.model_name = self.conf.get_config_param('model_name')
         self.prompt_tokens = 0
         self.completion_tokens = 0
+        self.use_automations = use_automations
 
         if self.use_local_llm:
             self.openai = None
@@ -41,8 +43,14 @@ class Brain():
         
             if len(self.events_memory) > 0:
                 memories = '\n'.join(self.events_memory[-self.max_memories:])
-                Logger.notify(f'Current memories: {memories}')
                 prompt += f'PastEvents:\n{memories}'
+                Logger.notify(f'Current memories: {memories}')
+
+            if len(self.home_automations) > 0:
+                auto_list = list(set(['- ' + json.loads(x)['action'] for x in self.home_automations]))
+                automations = '\n'.join(auto_list)
+                prompt += f'\nHomeAutomations:\n{automations}'
+                Logger.notify(f'Current automations: {automations}')
             
         prompt += f'\nOwnersAway: {self.owners_away}\n'
         # Add terminator to the system prompt
@@ -112,6 +120,8 @@ class Brain():
             # Memories are deserialized in a dict, we want to pass strings to the LLM
             if msg['event'] == 'OwnersAway':
                 self.owners_away = msg['action']
+            elif msg['event'] == 'HomeAutomation' and self.use_automations == True:
+                self.home_automations.append(json.dumps(msg))
             else:
                 self.events_memory.append(json.dumps(msg))
 

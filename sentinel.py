@@ -9,7 +9,7 @@ This class is used to analyse camera feeds and create memory blocks
 class Sentinel():
     def __init__(self, max_memories: int = 0):
         self.max_memories = max_memories
-        self.guard = Guard(max_memories=max_memories)
+        self.guard = Guard(max_memories=max_memories, use_automations=True)
         self.burglar = Burglar()
         self.llm_func = LLMFunctions()
 

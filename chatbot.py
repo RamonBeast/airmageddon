@@ -97,13 +97,18 @@ async def on_chat_start():
     listener = EventListener()
     memory_manager = MemoryManager()
     events_memory = memory_manager.get_last_run()
+    home_automations = []
 
     # This can happen if the user tries to inject memories with an invalid JSON string
     if events_memory is None:
         events_memory = []
 
     while (msg := listener.get_message_non_blocking()) is not None:
-        events_memory.append(json.dumps(msg))
+        if 'event' in msg:
+            if msg['event'] != 'HomeAutomation':
+                events_memory.append(json.dumps(msg))
+            else:
+                home_automations.append(json.dumps(msg))
 
     agent_prompt = conf.get_agent_config('chatbot')
     assert agent_prompt != None and len(agent_prompt) > 0
@@ -116,12 +121,15 @@ async def on_chat_start():
         model_id = conf.get_config_param('model_name')
 
     # Format memories in a way that doesn't disturb Langchain
-    memories = [f'{m["time"]} {m["event"]} {m["action"]}' for m in events_memory]
+    memories = [f'{m["time"]} {m["event"]} {m["action"]}\n' for m in events_memory]
+
+    # Format home automations in a way that doesn't disturb Langchain
+    automations = [f'- {h["action"]}\n' for h in home_automations]
 
     current_date = datetime.now().strftime("%d %b %Y")
     current_time = datetime.now().strftime("%H:%M")
     agent_prompt = agent_prompt.format(current_date=current_date, 
-                                       current_time=current_time, events_memory=memories,
+                                       current_time=current_time, events_memory=memories, home_automations=automations,
                                        owners_away=owners_away)
     
     model = ChatOpenAI(streaming=True,
@@ -160,24 +168,27 @@ async def on_message(message: cl.Message):
     messages = chat_history.messages
 
     response = await generate_answer(message, messages)
+    msg = ''
 
     if llm_func.is_function_call(response) != None:
         _, params = llm_func._parse_response(response)
 
-        if 'away' not in params:
-            return
-        
-        owner_status = f'Updating memory: '
+        if 'away' in params:
+            owner_status = f'Updating owners state: '
 
-        if params['away'] == True:
-            owner_status += 'owners away'
+            if params['away'] == True:
+                owner_status += 'owners away'
+            else:
+                owner_status += 'owners are back at home'
+
+            msg = owner_status
         else:
-            owner_status += 'owners are back at home'
+            msg = f'Updating HomeAutomations: {params["action"]}'
         
         llm_func.call_class_function(llm_func, response)
-        await cl.Message(owner_status).send()
+        await cl.Message(msg).send()
         
-        chat_history.add_ai_message(owner_status)
+        chat_history.add_ai_message(msg)
     else:
         if tts_enabled:
             output_name, output_audio = await text_to_speech(response)

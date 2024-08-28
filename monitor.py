@@ -89,7 +89,7 @@ def main():
 
             # Check if image similarity hit the threshold
             if sim >= threshold and not any(trigger in detections for trigger in triggers):
-                Logger.info(f'Skipping, similarity: {sim:0.2f}, detections: {detections}', ts=True)
+                #Logger.info(f'Skipping, similarity: {sim:0.2f}, detections: {detections}', ts=True)
                 continue
 
             # From here on, we start reasoning on the image itself
@@ -121,7 +121,6 @@ def main():
                 Logger.notify(f'[$] Cumulative tokens - prompt: {tokens["prompt_tokens"]}, completion: {tokens["completion_tokens"]}', ts=True)
             
             if (func_name := llm_func.is_function_call(response)) != None:
-                #Logger.warning(f'Passing control to Alarm: {response}')
                 save_detection(image, caption, response, False)
                 memory.create_memory(caption, func_name)
                 llm_func.call_class_function(llm_func, response)

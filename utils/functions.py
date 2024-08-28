@@ -64,5 +64,14 @@ class LLMFunctions():
     def owners_away(self, away: bool):
         self._memory.create_memory('OwnersAway', away)
         Logger.info(f'LLM invoked owners_away = {away}')
+
+    def enable_automation(self, action: str):
+        self._memory.create_memory('HomeAutomation', action)
+        Logger.info(f'LLM invoked enable_automation = {action}')
+
+    def open_door(self):
+        self._memory.create_memory('Action', 'open_door')
+        Logger.info('LLM invoked open_door')
+        Logger.notify('Door Opened')
         
 
